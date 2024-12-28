@@ -31,6 +31,9 @@ app.use(cookieParser());
 import { userRouter } from "./routes/routes.user";
 app.use("/api/v1/user", userRouter);
 
+import { githubRouter } from "./routes/routes.github";
+app.use("/api/v1/project", githubRouter)
+
 export {
 	app
 }

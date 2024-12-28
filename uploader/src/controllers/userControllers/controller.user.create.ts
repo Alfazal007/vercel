@@ -20,7 +20,7 @@ export const createUserController = asyncHandler(async (req: Request, res: Respo
 	const parsedData = createUserTypes.safeParse(data)
 	if (!parsedData.success) {
 		const zodErrors: string[] = []
-		parsedData.error.errors.map((err) => {
+		parsedData.error.errors.forEach((err) => {
 			zodErrors.push(err.message)
 		})
 		return res.status(400).json(new ApiError(400, "Zod errors", [], zodErrors))

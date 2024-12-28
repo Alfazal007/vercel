@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum State {
+  UPLOADING
+  DEPLOYING
+  DEPLOYED
+  ERROR
+}
+
 model User {
   id       String @id @default(uuid())
   username String @unique
@@ -14,7 +21,7 @@ model User {
 }
 
 model Projects {
-  id          String @id @default(uuid())
-  projectName String
-  githubUrl   String @unique
+  id        String @id @default(uuid())
+  githubUrl String
+  state     State
 }
