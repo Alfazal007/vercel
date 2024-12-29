@@ -6,6 +6,7 @@ import { cloneProject } from "../../helpers/cloneProject";
 import { prisma } from "../../config/prisma";
 import { ApiResponse } from "../../utils/apiResponse";
 import { createCloudinaryData } from "../../helpers/cloudinary";
+import { redisClient } from "../../config/redis";
 
 const createProjectType = z.object({
 	url: z.string({ message: "Github url not provided" }),
@@ -55,6 +56,10 @@ export const createNewClone = asyncHandler(async (req: Request, res: Response) =
 					state: "DEPLOYING"
 				}
 			})
+			if (!redisClient.isOpen) {
+				await redisClient.connect()
+			}
+			await redisClient.lPush("projects", JSON.stringify({ userId: currentUser.id, projectId: newProject.id }));
 			return res.status(200).json(new ApiResponse(200, "Deploying your application", {
 				projectId: newProject.id
 			}))
