@@ -5,9 +5,7 @@ import z from "zod";
 import { cloneProject } from "../../helpers/cloneProject";
 import { prisma } from "../../config/prisma";
 import { ApiResponse } from "../../utils/apiResponse";
-import { uploadToCloud } from "../../helpers/uploadToCloud";
 import { createCloudinaryData } from "../../helpers/cloudinary";
-import { Extensions } from "@prisma/client/runtime/library";
 
 const createProjectType = z.object({
 	url: z.string({ message: "Github url not provided" }),
@@ -22,7 +20,6 @@ export const createNewClone = asyncHandler(async (req: Request, res: Response) =
 
 	// check req body
 	const data = req.body
-	console.log({ data })
 	if (!data) {
 		return res.status(400).json(new ApiError(400, "No request body provided", []))
 	}
