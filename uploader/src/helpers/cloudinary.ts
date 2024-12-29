@@ -41,3 +41,15 @@ export async function createCloudinaryData(userId: string, projectId: string, fi
 	}
 }
 
+// TODO:: Move this to deploy worker v1
+export async function fetchAllFiles(folder: string) {
+	try {
+		cloudinary.search.expression(
+			'folder:vercel/*' // add your folder
+		).sort_by('public_id', 'desc').max_results(30).execute().then(result => console.log(result));
+	} catch (error) {
+		console.error('Error fetching files:', error);
+		throw error;
+	}
+}
+

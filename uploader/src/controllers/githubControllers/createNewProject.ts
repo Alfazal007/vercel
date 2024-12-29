@@ -5,18 +5,13 @@ import z from "zod";
 import { cloneProject } from "../../helpers/cloneProject";
 import { prisma } from "../../config/prisma";
 import { ApiResponse } from "../../utils/apiResponse";
-import path from "path";
-import { createCloudinaryData } from "../../helpers/cloudinary";
+import { uploadToCloud } from "../../helpers/uploadToCloud";
 
 const createProjectType = z.object({
 	url: z.string({ message: "Github url not provided" }),
 })
 
 export const createNewClone = asyncHandler(async (req: Request, res: Response) => {
-	const filePath = path.join(__dirname, "../../../public/some.txt")
-	await createCloudinaryData("1234", "5678", filePath)
-	return res.status(200).json({})
-	/*
 	// check auth
 	const currentUser = req.user;
 	if (!currentUser) {
@@ -50,12 +45,13 @@ export const createNewClone = asyncHandler(async (req: Request, res: Response) =
 		if (!resCloneProject) {
 			return res.status(400).json(new ApiError(400, "Issue deploying the project, try again later", []))
 		}
+		//		const uploadToCloudRes = await uploadToCloud(newProject.id);
+
+		// TODO: Complete this logic
+
 		return res.status(200).json(new ApiResponse(200, "Done", []))
-
-
 	} catch (err) {
 		console.log({ err })
 		return res.status(400).json(new ApiError(400, "Issue talking to the database", []))
 	}
-	*/
 });
