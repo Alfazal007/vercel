@@ -6,6 +6,8 @@ import { cloneProject } from "../../helpers/cloneProject";
 import { prisma } from "../../config/prisma";
 import { ApiResponse } from "../../utils/apiResponse";
 import { uploadToCloud } from "../../helpers/uploadToCloud";
+import { createCloudinaryData } from "../../helpers/cloudinary";
+import { Extensions } from "@prisma/client/runtime/library";
 
 const createProjectType = z.object({
 	url: z.string({ message: "Github url not provided" }),
@@ -45,11 +47,22 @@ export const createNewClone = asyncHandler(async (req: Request, res: Response) =
 		if (!resCloneProject) {
 			return res.status(400).json(new ApiError(400, "Issue deploying the project, try again later", []))
 		}
-		//		const uploadToCloudRes = await uploadToCloud(newProject.id);
 
-		// TODO: Complete this logic
-
-		return res.status(200).json(new ApiResponse(200, "Done", []))
+		const uploadToCloudinary = await createCloudinaryData(currentUser.id, newProject.id);
+		if (uploadToCloudinary) {
+			await prisma.projects.update({
+				where: {
+					id: newProject.id
+				},
+				data: {
+					state: "DEPLOYING"
+				}
+			})
+			return res.status(200).json(new ApiResponse(200, "Deploying your application", {
+				projectId: newProject.id
+			}))
+		}
+		return res.status(400).json(new ApiResponse(400, "There was an error uploading the project, try again later", {}))
 	} catch (err) {
 		console.log({ err })
 		return res.status(400).json(new ApiError(400, "Issue talking to the database", []))
