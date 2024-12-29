@@ -70,22 +70,3 @@ async function getAllFilePaths(folderPath: string) {
 	return filePaths;
 }
 
-// TODO:: Move this to deploy worker v1
-export async function fetchAllFiles(userId: string, projectId: string) {
-	try {
-		const filesOnCloudinary: string[] = []
-		const publicIds: string[] = []
-		const res = await cloudinary.search.expression(
-			`folder:vercel1/${userId}/${projectId}/*`
-		).max_results(500).execute();
-		res.resources.forEach((object: any) => {
-			publicIds.push(object.public_id)
-			filesOnCloudinary.push(object.folder)
-		});
-		console.log({ publicIds })
-		console.log({ filesOnCloudinary })
-	} catch (error) {
-		console.error('Error fetching files:', error);
-		throw error;
-	}
-}
