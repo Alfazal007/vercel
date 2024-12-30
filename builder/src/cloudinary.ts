@@ -15,7 +15,7 @@ export async function fetchAllFiles(userId: string, projectId: string) {
 		const filesOnCloudinary: string[] = []
 		const publicIds: string[] = []
 		const res = await cloudinary.search
-			.expression(`folder:vercel11/${userId}/${projectId}/* AND resource_type:raw`)
+			.expression(`folder:vercel12/${userId}/${projectId}/* AND resource_type:raw`)
 			.max_results(500)
 			.execute();
 
@@ -63,7 +63,7 @@ export async function downloadFile(publicId: string, userId: string, projectId: 
 // upload dist folder to cloudinary
 const uploadToCloudinary = (buffer: Buffer, userId: string, path: string, fileName: string, projectId: string) => {
 	return new Promise((resolve, reject) => {
-		const index = path.indexOf("vercel11/dist")
+		const index = path.indexOf("vercel12/dist")
 		const pathCloudinary = path.substring(index + 14)
 		const updatedFolder = pathCloudinary.replace(fileName, "")
 		const stream = cloudinary.uploader.upload_stream(
@@ -71,7 +71,7 @@ const uploadToCloudinary = (buffer: Buffer, userId: string, path: string, fileNa
 				unique_filename: false,
 				overwrite: true,
 				resource_type: "raw",
-				folder: `/vercel11/dist/${projectId}/${updatedFolder}`,
+				folder: `/vercel12/dist/${projectId}/${updatedFolder}`,
 				public_id: `${fileName}`
 			},
 			(error, result) => {
@@ -84,7 +84,7 @@ const uploadToCloudinary = (buffer: Buffer, userId: string, path: string, fileNa
 };
 
 export async function createCloudinaryData(userId: string, projectId: string): Promise<boolean> {
-	const targetFolder = path.join(__dirname, `../output/vercel11/`)
+	const targetFolder = path.join(__dirname, `../output/vercel12/`)
 	try {
 		const files = await getAllFilePaths(targetFolder + "dist/")
 		const uploads = files.map(async (filePath) => {
