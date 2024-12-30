@@ -3,7 +3,7 @@ import path from "path"
 
 export function runCommands() {
 	return new Promise((resolve, reject) => {
-		const pathToFolder = path.join(__dirname, "../output/vercel12/")
+		const pathToFolder = path.join(__dirname, "../output/vercel/")
 		const command = `cd ${pathToFolder} && npm install && npm run build`;
 
 		exec(command, (error, stdout, stderr) => {
