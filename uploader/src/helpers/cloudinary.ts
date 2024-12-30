@@ -19,7 +19,7 @@ const uploadToCloudinary = (buffer: Buffer, userId: string, path: string, fileNa
 				unique_filename: false,
 				overwrite: true,
 				resource_type: "raw",
-				folder: `/vercel/${userId}/${updatedFolder}`,
+				folder: `/vercel11/${userId}/${updatedFolder}`,
 				public_id: `${fileName}`
 			},
 			(error, result) => {

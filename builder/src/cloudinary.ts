@@ -14,9 +14,11 @@ export async function fetchAllFiles(userId: string, projectId: string) {
 	try {
 		const filesOnCloudinary: string[] = []
 		const publicIds: string[] = []
-		const res = await cloudinary.search.expression(
-			`folder:vercel4/${userId}/${projectId}/*`
-		).max_results(500).execute();
+		const res = await cloudinary.search
+			.expression(`folder:vercel11/${userId}/${projectId}/* AND resource_type:raw`)
+			.max_results(500)
+			.execute();
+
 		res.resources.forEach((object: any) => {
 			publicIds.push(object.public_id)
 			filesOnCloudinary.push(object.folder)
@@ -25,12 +27,6 @@ export async function fetchAllFiles(userId: string, projectId: string) {
 		await Promise.all(downloadPromises);
 		return true
 	} catch (error) {
-		try {
-			const targetFolder = path.join(__dirname, `../output/`)
-			fs.rmSync(targetFolder, { force: true, recursive: true });
-		} catch (cleanupError) {
-			console.error("Failed to clean up:", cleanupError);
-		}
 		console.error('Error fetching files:', error);
 		return false
 	}
@@ -64,3 +60,58 @@ export async function downloadFile(publicId: string, userId: string, projectId: 
 	}
 }
 
+// upload dist folder to cloudinary
+const uploadToCloudinary = (buffer: Buffer, userId: string, path: string, fileName: string, projectId: string) => {
+	return new Promise((resolve, reject) => {
+		const index = path.indexOf("vercel11/dist")
+		const pathCloudinary = path.substring(index + 14)
+		const updatedFolder = pathCloudinary.replace(fileName, "")
+		const stream = cloudinary.uploader.upload_stream(
+			{
+				unique_filename: false,
+				overwrite: true,
+				resource_type: "raw",
+				folder: `/vercel11/${userId}/dist/${projectId}/${updatedFolder}`,
+				public_id: `${fileName}`
+			},
+			(error, result) => {
+				if (error) reject(error);
+				else resolve(result);
+			}
+		);
+		stream.end(buffer);
+	});
+};
+
+export async function createCloudinaryData(userId: string, projectId: string): Promise<boolean> {
+	const targetFolder = path.join(__dirname, `../output/vercel11/`)
+	try {
+		const files = await getAllFilePaths(targetFolder + "dist/")
+		const uploads = files.map(async (filePath) => {
+			const buffer = await fs.promises.readFile(filePath);
+			return uploadToCloudinary(buffer, userId, filePath, path.basename(filePath), projectId);
+		});
+		await Promise.all(uploads);
+		return true;
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+}
+
+async function getAllFilePaths(folderPath: string) {
+	const filePaths: string[] = [];
+	async function traverse(currentPath: string) {
+		const items = await fs.promises.readdir(currentPath, { withFileTypes: true });
+		for (const item of items) {
+			const fullPath = path.join(currentPath, item.name);
+			if (item.isDirectory()) {
+				await traverse(fullPath);
+			} else if (item.isFile()) {
+				filePaths.push(fullPath);
+			}
+		}
+	}
+	await traverse(folderPath);
+	return filePaths;
+}

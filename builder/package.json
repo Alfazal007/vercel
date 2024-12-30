@@ -14,11 +14,13 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@prisma/client": "6.1.0",
     "axios": "^1.7.9",
     "cloudinary": "^2.5.1",
     "dotenv": "^16.4.7",
     "fs": "0.0.1-security",
     "path": "^0.12.7",
+    "prisma": "^6.1.0",
     "redis": "^4.7.0"
   }
 }
